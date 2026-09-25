@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import budgetBasicsLogo from '../../assets/budgetbasics-logo.png'
+import { useStudentProfile } from '../../hooks/useStudentProfile'
 
 const learnItems = [
   { to: '/budgeting-basics', label: 'Budgeting Basics' },
@@ -31,6 +32,7 @@ function RouteLink({ item, className = 'desktop-nav-link', onClick }) {
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [openMenu, setOpenMenu] = useState(null)
+  const { currentStudent } = useStudentProfile()
   const location = useLocation()
   const learnActive = learnItems.some((item) => item.to === location.pathname)
   const toolsActive = toolItems.some((item) => item.to === location.pathname)
@@ -82,7 +84,8 @@ export function Navbar() {
         </div>
 
         <div className="navbar-right">
-          <Link to="/budgeting-basics" className="navbar-get-started" onClick={closeAllMenus}>Get Started</Link>
+          <Link to={currentStudent ? '/student-dashboard' : '/signin'} className="navbar-profile-link" onClick={closeAllMenus}>{currentStudent ? currentStudent.name : 'Sign In'}</Link>
+          <Link to={currentStudent ? '/student-dashboard' : '/create-profile'} className="navbar-get-started" onClick={closeAllMenus}>{currentStudent ? 'Dashboard' : 'Get Started'}</Link>
           <button
             type="button"
             className="mobile-menu-btn"
@@ -104,6 +107,9 @@ export function Navbar() {
           <p className="mobile-nav-section-title">Tools</p>
           {toolItems.map((item) => <RouteLink key={item.to} item={item} className="mobile-nav-link" onClick={closeAllMenus} />)}
           <RouteLink item={{ to: '/search', label: 'Search' }} className="mobile-nav-link" onClick={closeAllMenus} />
+          <p className="mobile-nav-section-title">Profile</p>
+          <RouteLink item={{ to: currentStudent ? '/student-dashboard' : '/signin', label: currentStudent ? 'Dashboard' : 'Sign In' }} className="mobile-nav-link" onClick={closeAllMenus} />
+          {!currentStudent && <RouteLink item={{ to: '/create-profile', label: 'Create Profile' }} className="mobile-nav-link" onClick={closeAllMenus} />}
         </nav>
       </div>
     </header>

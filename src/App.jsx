@@ -11,6 +11,10 @@ import { LearningGallery } from './pages/LearningGallery'
 import { Search } from './pages/Search'
 import { PlaceholderPage } from './pages/PlaceholderPage'
 import { NotFound } from './pages/NotFound'
+import { CreateProfile } from './pages/CreateProfile'
+import { SignIn } from './pages/SignIn'
+import { StudentDashboard } from './pages/StudentDashboard'
+import { StudentProfileProvider } from './context/StudentProfileContext'
 import './App.css'
 import './components/ui/LessonSystem.css'
 
@@ -26,7 +30,8 @@ const placeholderRoutes = {
 function App() {
   return (
     <BrowserRouter>
-      <AppShell>
+      <StudentProfileProvider>
+        <AppShell>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/budgeting-basics" element={<BudgetingBasics />} />
@@ -37,6 +42,9 @@ function App() {
           <Route path="/money-mistakes" element={<MoneyMistakes />} />
           <Route path="/learning-gallery" element={<LearningGallery />} />
           <Route path="/search" element={<Search />} />
+          <Route path="/signin" element={<SignIn />} />
+          <Route path="/create-profile" element={<CreateProfile />} />
+          <Route path="/student-dashboard" element={<StudentDashboard />} />
           {Object.entries(placeholderRoutes).map(([path, [title, description]]) => (
             <Route
               key={path}
@@ -46,7 +54,8 @@ function App() {
           ))}
           <Route path="*" element={<NotFound />} />
         </Routes>
-      </AppShell>
+        </AppShell>
+      </StudentProfileProvider>
     </BrowserRouter>
   )
 }
