@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none">
+  <rect width="48" height="48" rx="12" fill="#0B6B53"/>
+  <!-- Modern geometric hexagonal honeycomb + stylized intelligent bee wings -->
+  <path d="M24 10L35 16.5V29.5L24 36L13 29.5V16.5L24 10Z" stroke="#D7A93D" stroke-width="2.5" stroke-linejoin="round" fill="none"/>
+  <!-- Central stylized nucleus / bee body -->
+  <rect x="22" y="18" width="4" height="12" rx="2" fill="#FFFFFF"/>
+  <path d="M17 21C17 21 21 20 22 23C22 25 19 26 17 26" stroke="#D7A93D" stroke-width="2" stroke-linecap="round" fill="none"/>
+  <path d="M31 21C31 21 27 20 26 23C26 25 29 26 31 26" stroke="#D7A93D" stroke-width="2" stroke-linecap="round" fill="none"/>
+  <circle cx="24" cy="15" r="1.5" fill="#FFFFFF"/>
+</svg>
