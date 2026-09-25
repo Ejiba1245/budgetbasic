@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import moneyMistakesImage from '../assets/images/lessons/budgetbee-student-budgeting.png'
 import { Breadcrumbs } from '../components/ui/Breadcrumbs'
 import { PageContainer } from '../components/layout/PageContainer'
 
@@ -64,6 +65,10 @@ export function MoneyMistakes() {
         </div>
         <div className="money-mistakes-note"><span className="material-symbols-outlined" aria-hidden="true">school</span><p>Use these examples as prompts for reflection, not as judgements about your real financial situation.</p></div>
       </header>
+
+      <figure className="money-mistakes-image">
+        <img src={moneyMistakesImage} alt="Laptop and notebook used for reviewing financial plans and spending choices." />
+      </figure>
 
       <section className="mistakes-learning-intro" aria-labelledby="mistakes-start-title">
         <span className="section-eyebrow">How to use this lesson</span>
