@@ -3,35 +3,38 @@ import { Breadcrumbs } from '../components/ui/Breadcrumbs'
 import { Button } from '../components/ui/Button'
 import { Card } from '../components/ui/Card'
 import { EducationalImage } from '../components/ui/EducationalImage'
+import { allocationPresets, allocationRanges, calculateBudgetSplit } from '../utils/budgetRule'
+import { allocationBuckets } from '../data/rule'
+
+function formatAmount(value) {
+  return value.toLocaleString('en-US')
+}
 
 export function Calculator503020() {
   const [currency, setCurrency] = useState('$')
-  const [income, setIncome] = useState(2400)
+  const [incomeInput, setIncomeInput] = useState('2400')
   const [needsPct, setNeedsPct] = useState(50)
   const [wantsPct, setWantsPct] = useState(30)
   const [savingsPct, setSavingsPct] = useState(20)
 
-  const presets = [
-    { label: '$1,200', sub: '(Part-time)', amount: 1200 },
-    { label: '$2,400', sub: '(Avg Intern)', amount: 2400 },
-    { label: '$3,500', sub: '(Entry Level)', amount: 3500 },
-    { label: '$5,000', sub: '(Dual/Co-op)', amount: 5000 },
-  ]
-
-  const totalPct = needsPct + wantsPct + savingsPct
-  const isBalanced = totalPct === 100
-
-  const safeIncome = Math.max(0, income || 0)
-  const needsAmount = Math.round((safeIncome * needsPct) / 100)
-  const wantsAmount = Math.round((safeIncome * wantsPct) / 100)
-  const savingsAmount = Math.round((safeIncome * savingsPct) / 100)
-  const annualSavings = savingsAmount * 12
+  const split = calculateBudgetSplit({
+    income: incomeInput,
+    needsPct,
+    wantsPct,
+    savingsPct,
+  })
 
   const handleResetRatios = () => {
     setNeedsPct(50)
     setWantsPct(30)
     setSavingsPct(20)
   }
+
+  const allocationMessage = split.isBalanced
+    ? 'Needs, wants and savings add up to 100%.'
+    : split.difference > 0
+      ? `Add ${split.difference}% to reach 100%.`
+      : `Remove ${Math.abs(split.difference)}% to reach 100%.`
 
   return (
     <div className="calculator-503020-page">
@@ -40,10 +43,14 @@ export function Calculator503020() {
           <span className="section-eyebrow">Lesson 03 · A budgeting guideline</span>
           <h1 id="rule-lesson-title">The 50/30/20 rule: learn first, calculate second</h1>
           <p>The 50/30/20 framework divides an example income into needs, wants and savings. It is a starting point for organising a conversation about priorities, not a universal financial requirement.</p>
-          <div className="tool-lesson-columns"><div><strong>50% needs</strong><span>Essentials such as housing, food, basic transport and required costs.</span></div><div><strong>30% wants</strong><span>Flexible choices such as entertainment, dining out and upgrades.</span></div><div><strong>20% savings</strong><span>Money set aside for a goal, a future cost or a buffer.</span></div></div>
+          <div className="tool-lesson-columns">
+            <div><strong>50% needs</strong><span>Essentials such as housing, food, basic transport and required costs.</span></div>
+            <div><strong>30% wants</strong><span>Flexible choices such as entertainment, dining out and upgrades.</span></div>
+            <div><strong>20% savings</strong><span>Money set aside for a goal, a future cost or a buffer.</span></div>
+          </div>
         </section>
-        {/* Top Context & Breadcrumbs */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+
+        <div className="calc-context-row">
           <Breadcrumbs
             items={[
               { label: 'Home', to: '/' },
@@ -51,45 +58,40 @@ export function Calculator503020() {
               { label: '50/30/20 Rule Calculator' },
             ]}
           />
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div className="calc-context-badges">
             <span className="brand-badge badge-secondary">
-              <span className="material-symbols-outlined text-[14px]">verified</span>
+              <span className="material-symbols-outlined" aria-hidden="true">verified</span>
               Educational example
             </span>
-            <span style={{ fontSize: '11px', color: 'var(--color-outline)', letterSpacing: '0.04em' }}>
-              READ AND TRY
-            </span>
+            <span className="calc-context-kicker">READ AND TRY</span>
           </div>
         </div>
 
-        {/* Editorial Masthead */}
-        <section style={{ marginBottom: '24px' }}>
-          <div className="stitch-card elevation-1" style={{ padding: '28px', position: 'relative', overflow: 'hidden' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px', alignItems: 'center' }}>
+        <section className="rule-masthead">
+          <div className="rule-masthead-card">
+            <div className="rule-masthead-grid">
               <div>
                 <span className="section-eyebrow">Budgeting Basics · Practical tool</span>
-                <h1 className="hero-title" style={{ fontSize: '32px', margin: '4px 0 10px' }}>
-                  The 50/30/20 Budgeting Rule
-                </h1>
-                <p className="hero-copy" style={{ fontSize: '15px', margin: '0 0 16px' }}>
-                  A simple framework for allocating after-tax income into Needs, Wants, and Savings.
+                <h2 className="rule-masthead-title">The 50/30/20 Budgeting Rule</h2>
+                <p className="rule-masthead-copy">
+                  A simple framework for allocating after-tax income into Needs, Wants and Savings.
                   Enter an income amount to see the monthly breakdown.
                 </p>
 
-                <div style={{ background: 'var(--color-surface-container-low)', padding: '12px 16px', borderRadius: '8px', display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
-                  <span className="material-symbols-outlined text-primary text-[20px] shrink-0 mt-0.5">school</span>
-                  <p style={{ fontSize: '13px', color: 'var(--color-on-surface-variant)', lineHeight: 1.5, margin: 0 }}>
-                    <strong>Educational Rule of Thumb:</strong> The 50/30/20 framework is a guiding benchmark, not a rigid mandate.
-                    High cost-of-living students may adjust ratios (e.g. 60/25/15) based on living realities without losing control.
+                <div className="rule-guideline-note">
+                  <span className="material-symbols-outlined" aria-hidden="true">school</span>
+                  <p>
+                    <strong>Educational rule of thumb:</strong> the 50/30/20 framework is a guiding
+                    benchmark, not a rigid mandate. A student in a high cost-of-living area may adjust
+                    the ratios (for example 60/25/15) to match their situation without losing control.
                   </p>
                 </div>
               </div>
 
-              {/* Ratio Metric Snapshot */}
               <div>
                 <EducationalImage
-                  asset="50-30-20-rule.png"
-                  alt="Visual explanation of the 50/30/20 budgeting guideline."
+                  asset="50-30-20-student-rule.png"
+                  alt="Pie chart showing needs, wants and savings proportions in the 50/30/20 guideline."
                   className="rule-visual"
                 />
               </div>
@@ -97,109 +99,103 @@ export function Calculator503020() {
           </div>
         </section>
 
-        {/* The three budget categories */}
-        <section style={{ marginBottom: '32px' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 'var(--gutter)' }}>
-            <Card elevation={1} style={{ padding: '20px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
-                <div className="edu-icon-wrap" style={{ background: 'var(--color-primary)', color: '#ffffff' }}>
-                  <span className="material-symbols-outlined text-[20px]">home_work</span>
-                </div>
-                <span className="tabular-nums" style={{ fontSize: '28px', fontWeight: 700, color: 'var(--color-primary)' }}>
-                  {needsPct}%
-                </span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                <h3 style={{ fontSize: '16px', fontWeight: 700, margin: 0 }}>Essentials & Needs</h3>
-                <span className="brand-badge badge-primary">Essentials</span>
-              </div>
-              <p style={{ fontSize: '13px', color: 'var(--color-on-surface-variant)', lineHeight: 1.5, margin: '0 0 12px' }}>
-                Critical living expenses required to survive and function responsibly while enrolled or starting your career.
-              </p>
-              <ul className="example-items-list">
-                <li className="example-item"><span className="pulse-dot" style={{ width: '6px', height: '6px' }}></span><span>Rent, dorm fees, or base mortgage</span></li>
-                <li className="example-item"><span className="pulse-dot" style={{ width: '6px', height: '6px' }}></span><span>Core groceries, meal-plan base</span></li>
-                <li className="example-item"><span className="pulse-dot" style={{ width: '6px', height: '6px' }}></span><span>Utilities, WiFi, primary transit pass</span></li>
-                <li className="example-item"><span className="pulse-dot" style={{ width: '6px', height: '6px' }}></span><span>Prescriptions, minimum student loan dues</span></li>
-              </ul>
-            </Card>
-
-            <Card elevation={1} style={{ padding: '20px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
-                <div className="edu-icon-wrap" style={{ background: 'var(--color-tertiary-container)', color: '#ffffff' }}>
-                  <span className="material-symbols-outlined text-[20px]">celebration</span>
-                </div>
-                <span className="tabular-nums" style={{ fontSize: '28px', fontWeight: 700, color: 'var(--color-tertiary-container)' }}>
-                  {wantsPct}%
-                </span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                <h3 style={{ fontSize: '16px', fontWeight: 700, margin: 0 }}>Lifestyle & Wants</h3>
-                <span className="brand-badge badge-tertiary">Flexible spending</span>
-              </div>
-              <p style={{ fontSize: '13px', color: 'var(--color-on-surface-variant)', lineHeight: 1.5, margin: '0 0 12px' }}>
-                Discretionary purchases that uplift student life, culture, recreation, and social bonds without guilt.
-              </p>
-              <ul className="example-items-list">
-                <li className="example-item"><span className="pulse-dot" style={{ width: '6px', height: '6px', background: 'var(--color-tertiary-container)' }}></span><span>Takeout, coffee runs & dining out</span></li>
-                <li className="example-item"><span className="pulse-dot" style={{ width: '6px', height: '6px', background: 'var(--color-tertiary-container)' }}></span><span>Streaming services, gaming subscriptions</span></li>
-                <li className="example-item"><span className="pulse-dot" style={{ width: '6px', height: '6px', background: 'var(--color-tertiary-container)' }}></span><span>Concert tickets, campus social outings</span></li>
-                <li className="example-item"><span className="pulse-dot" style={{ width: '6px', height: '6px', background: 'var(--color-tertiary-container)' }}></span><span>Non-essential wardrobe upgrades & travel</span></li>
-              </ul>
-            </Card>
-
-            <Card elevation={1} style={{ padding: '20px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
-                <div className="edu-icon-wrap" style={{ background: 'var(--color-secondary)', color: '#ffffff' }}>
-                  <span className="material-symbols-outlined text-[20px]">trending_up</span>
-                </div>
-                <span className="tabular-nums" style={{ fontSize: '28px', fontWeight: 700, color: 'var(--color-secondary)' }}>
-                  {savingsPct}%
-                </span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                <h3 style={{ fontSize: '16px', fontWeight: 700, margin: 0 }}>Future & Savings</h3>
-                <span className="brand-badge badge-secondary">Future needs</span>
-              </div>
-              <p style={{ fontSize: '13px', color: 'var(--color-on-surface-variant)', lineHeight: 1.5, margin: '0 0 12px' }}>
-                Direct safety netting, rapid emergency cash, and debt reduction to ensure post-graduation stability.
-              </p>
-              <ul className="example-items-list">
-                <li className="example-item"><span className="pulse-dot" style={{ width: '6px', height: '6px', background: 'var(--color-secondary)' }}></span><span>Liquid $1,000 emergency buffer fund</span></li>
-                <li className="example-item"><span className="pulse-dot" style={{ width: '6px', height: '6px', background: 'var(--color-secondary)' }}></span><span>High-yield savings accounts (HYSA)</span></li>
-                <li className="example-item"><span className="pulse-dot" style={{ width: '6px', height: '6px', background: 'var(--color-secondary)' }}></span><span>Aggressive debt principal prepayments</span></li>
-                <li className="example-item"><span className="pulse-dot" style={{ width: '6px', height: '6px', background: 'var(--color-secondary)' }}></span><span>Starter Roth IRA or index micro-investments</span></li>
-              </ul>
-            </Card>
+        <section className="rule-study-section" aria-labelledby="rule-study-title">
+          <EducationalImage
+            asset="50-30-20-student-rule.png"
+            alt="Pie chart showing needs, wants and savings proportions in the 50/30/20 guideline."
+            className="rule-study-image"
+          />
+          <div>
+            <span className="section-eyebrow">Read the example</span>
+            <h2 id="rule-study-title">How the guideline works in practice</h2>
+            <p>
+              For an illustrative monthly income of {currency}{formatAmount(split.income)}, the starting
+              split would be {currency}{formatAmount(split.needsAmount)} for needs,{' '}
+              {currency}{formatAmount(split.wantsAmount)} for wants and{' '}
+              {currency}{formatAmount(split.savingsAmount)} for savings, provided the percentages total
+              100%. If the sliders do not add up to 100%, the figures below are shown as a provisional
+              example rather than a valid plan.
+            </p>
+            <p>
+              The guideline may need adjustment when essential costs take more space, income changes or a
+              student has a specific short-term goal. Use the sliders below to explore a different balance
+              and keep the total at 100%.
+            </p>
           </div>
         </section>
 
-        {/* Income and ratio controls */}
+        <section className="rule-reflection-section">
+          <div>
+            <span className="section-eyebrow">Knowledge check</span>
+            <h2>What makes this a guideline rather than a rule?</h2>
+            <p>
+              Individual income, essential costs, location, responsibilities and goals differ. The useful
+              part is the act of assigning money to priorities, not following one fixed percentage.
+            </p>
+          </div>
+          <details className="knowledge-check">
+            <summary>Reveal the answer</summary>
+            <p><strong>Answer:</strong> the percentages are a starting point that can be adjusted to fit a person’s circumstances.</p>
+          </details>
+        </section>
+
+        <section className="rule-buckets" aria-labelledby="rule-buckets-title">
+          <div className="rule-buckets-heading">
+            <span className="section-eyebrow">The three buckets</span>
+            <h2 id="rule-buckets-title">What belongs in each category</h2>
+          </div>
+          <div className="rule-buckets-grid">
+            {allocationBuckets.map((bucket) => (
+              <Card key={bucket.key} elevation={1} className={`rule-bucket-card is-${bucket.tone}`}>
+                <div className="rule-bucket-top">
+                  <span className="edu-icon-wrap" aria-hidden="true">
+                    <span className="material-symbols-outlined">{bucket.icon}</span>
+                  </span>
+                  <span className="rule-bucket-pct tabular-nums">
+                    {split[`${bucket.key}Pct`]}%
+                  </span>
+                </div>
+                <div className="rule-bucket-heading">
+                  <h3>{bucket.title}</h3>
+                  <span className={`brand-badge badge-${bucket.tone}`}>{bucket.badge}</span>
+                </div>
+                <p>{bucket.description}</p>
+                <ul className="example-items-list">
+                  {bucket.examples.map((example) => (
+                    <li className="example-item" key={example}>
+                      <span className={`pulse-dot is-${bucket.tone}`} aria-hidden="true" />
+                      <span>{example}</span>
+                    </li>
+                  ))}
+                </ul>
+              </Card>
+            ))}
+          </div>
+        </section>
+
         <section className="calc-page-layout">
-          {/* Controls Column (5 cols) */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div className="calc-controls-column">
             <Card elevation={2} style={{ padding: '24px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <div className="calc-step-heading">
                 <div>
                   <span className="section-eyebrow">Step 01</span>
-                  <h2 style={{ fontSize: '18px', fontWeight: 700, margin: 0 }}>Monthly Net Income</h2>
+                  <h2>Monthly Net Income</h2>
                 </div>
-                <span className="material-symbols-outlined text-primary text-[24px]">payments</span>
+                <span className="material-symbols-outlined calc-step-icon" aria-hidden="true">payments</span>
               </div>
 
-              {/* Currency & Input */}
-              <div style={{ marginBottom: '16px' }}>
-                <label htmlFor="income-input" style={{ fontSize: '13px', color: 'var(--color-secondary)', display: 'block', marginBottom: '6px' }}>
-                  After-tax take-home earnings / allowance
+              <div className="calc-income-field">
+                <label htmlFor="income-input" className="calc-field-label">
+                  After-tax takehome earnings or allowance
                 </label>
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  <div style={{ width: '90px', flexShrink: 0 }}>
+                <div className="calc-income-row">
+                  <div className="calc-currency-field">
+                    <label htmlFor="currency-select" className="sr-only">Currency</label>
                     <select
+                      id="currency-select"
                       value={currency}
-                      onChange={(e) => setCurrency(e.target.value)}
+                      onChange={(event) => setCurrency(event.target.value)}
                       className="stitch-select"
-                      style={{ padding: '10px 8px' }}
-                      aria-label="Currency"
                     >
                       <option value="$">$ USD</option>
                       <option value="₦">₦ NGN</option>
@@ -207,191 +203,192 @@ export function Calculator503020() {
                       <option value="£">£ GBP</option>
                     </select>
                   </div>
-                  <div className="stitch-input-wrap" style={{ flex: 1 }}>
+                  <div className="stitch-input-wrap calc-income-input">
                     <span className="input-prefix">{currency}</span>
                     <input
                       id="income-input"
                       type="number"
                       min="0"
                       step="50"
-                      value={income}
-                      onChange={(e) => setIncome(Number(e.target.value))}
+                      value={incomeInput}
+                      onChange={(event) => setIncomeInput(event.target.value)}
                       className="stitch-input tabular-nums"
-                      style={{ fontSize: '18px', fontWeight: 700 }}
+                      aria-describedby="income-hint"
                     />
                   </div>
                 </div>
+                <span id="income-hint" className="calc-field-hint">
+                  {split.hasValidIncome
+                    ? 'Educational figures only. Never enter real account or payment details.'
+                    : 'Enter an income amount greater than 0 to see a monthly breakdown.'}
+                </span>
               </div>
 
-              {/* Preset Student Chips */}
-              <div style={{ marginBottom: '20px' }}>
-                <span style={{ fontSize: '12px', color: 'var(--color-secondary)', display: 'block', marginBottom: '6px' }}>
-                  Quick Student Benchmarks:
-                </span>
-                <div className="preset-chip-group">
-                  {presets.map((p) => (
+              <div className="calc-presets">
+                <span className="calc-field-label" id="preset-label">Quick student benchmarks</span>
+                <div className="preset-chip-group" role="group" aria-labelledby="preset-label">
+                  {allocationPresets.map((preset) => (
                     <button
-                      key={p.amount}
+                      key={preset.amount}
                       type="button"
-                      className={`preset-chip ${income === p.amount ? 'active' : ''}`}
-                      onClick={() => setIncome(p.amount)}
+                      className={`preset-chip ${split.income === preset.amount ? 'active' : ''}`}
+                      onClick={() => setIncomeInput(String(preset.amount))}
                     >
-                      <span>{currency}{p.amount.toLocaleString()}</span> <span style={{ fontSize: '11px', opacity: 0.8 }}>{p.sub}</span>
+                      <span>{currency}{formatAmount(preset.amount)}</span>{' '}
+                      <span className="preset-chip-sub">{preset.sub}</span>
                     </button>
                   ))}
                 </div>
               </div>
 
-              {/* Step 02: Ratio Customizer */}
-              <div style={{ borderTop: '1px solid var(--color-surface-container-high)', paddingTop: '16px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+              <div className="calc-ratio-section">
+                <div className="calc-step-heading">
                   <div>
                     <span className="section-eyebrow">Step 02</span>
-                      <h3 style={{ fontSize: '16px', fontWeight: 700, margin: 0 }}>Adjust the percentages</h3>
+                    <h3>Adjust the percentages</h3>
                   </div>
-                  <button
-                    type="button"
-                    onClick={handleResetRatios}
-                    style={{ background: 'none', border: 'none', color: 'var(--color-primary)', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}
-                  >
+                  <button type="button" className="calc-reset-button" onClick={handleResetRatios}>
                     Reset 50/30/20
                   </button>
                 </div>
 
-                {/* Needs Slider */}
                 <div className="ratio-slider-control">
                   <div className="slider-label-row">
-                    <span style={{ color: 'var(--color-primary)' }}>Needs Target</span>
+                    <label htmlFor="needs-slider" className="slider-label slider-label-needs">Needs target</label>
                     <span className="tabular-nums">{needsPct}%</span>
                   </div>
                   <input
+                    id="needs-slider"
                     type="range"
-                    min="20"
-                    max="80"
+                    min={allocationRanges.needs.min}
+                    max={allocationRanges.needs.max}
+                    step="1"
                     value={needsPct}
-                    onChange={(e) => setNeedsPct(Number(e.target.value))}
+                    onChange={(event) => setNeedsPct(Number(event.target.value))}
                     className="stitch-slider"
-                    aria-label="Needs target percentage"
+                    aria-valuetext={`${needsPct} percent for needs`}
                   />
                 </div>
 
-                {/* Wants Slider */}
                 <div className="ratio-slider-control">
                   <div className="slider-label-row">
-                    <span style={{ color: 'var(--color-tertiary-container)' }}>Wants Target</span>
+                    <label htmlFor="wants-slider" className="slider-label slider-label-wants">Wants target</label>
                     <span className="tabular-nums">{wantsPct}%</span>
                   </div>
                   <input
+                    id="wants-slider"
                     type="range"
-                    min="0"
-                    max="60"
+                    min={allocationRanges.wants.min}
+                    max={allocationRanges.wants.max}
+                    step="1"
                     value={wantsPct}
-                    onChange={(e) => setWantsPct(Number(e.target.value))}
+                    onChange={(event) => setWantsPct(Number(event.target.value))}
                     className="stitch-slider"
-                    aria-label="Wants target percentage"
+                    aria-valuetext={`${wantsPct} percent for wants`}
                   />
                 </div>
 
-                {/* Savings Slider */}
                 <div className="ratio-slider-control">
                   <div className="slider-label-row">
-                    <span style={{ color: 'var(--color-secondary)' }}>Savings Target</span>
+                    <label htmlFor="savings-slider" className="slider-label slider-label-savings">Savings target</label>
                     <span className="tabular-nums">{savingsPct}%</span>
                   </div>
                   <input
+                    id="savings-slider"
                     type="range"
-                    min="0"
-                    max="50"
+                    min={allocationRanges.savings.min}
+                    max={allocationRanges.savings.max}
+                    step="1"
                     value={savingsPct}
-                    onChange={(e) => setSavingsPct(Number(e.target.value))}
+                    onChange={(event) => setSavingsPct(Number(event.target.value))}
                     className="stitch-slider"
-                    aria-label="Savings target percentage"
+                    aria-valuetext={`${savingsPct} percent for savings`}
                   />
                 </div>
 
-                {/* Balance Banner */}
                 <div
-                  style={{
-                    padding: '8px 12px',
-                    borderRadius: '8px',
-                    marginTop: '12px',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    fontSize: '12px',
-                    background: isBalanced ? 'var(--color-surface-container-low)' : 'var(--color-error-container)',
-                    color: isBalanced ? 'var(--color-on-surface)' : 'var(--color-error)',
-                  }}
+                  className={`calc-allocation-banner ${split.isBalanced ? 'is-balanced' : 'is-unbalanced'}`}
+                  role="status"
                 >
-                  <span>Combined Allocation:</span>
-                  <strong className="tabular-nums">
-                    {totalPct}% {isBalanced ? '(Balanced)' : `(Adjust by ${100 - totalPct}%)`}
-                  </strong>
+                  <span>Combined allocation</span>
+                  <strong className="tabular-nums">{split.totalPct}%</strong>
+                  <span className="calc-allocation-message">{allocationMessage}</span>
                 </div>
               </div>
             </Card>
           </div>
 
-          {/* Results Output Column (7 cols) */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            {/* Needs Card */}
-            <div className="calc-breakdown-card" style={{ borderLeft: '4px solid var(--color-primary)' }}>
+          <div className="calc-results-column">
+            <div className={`calc-result-qualifier ${split.canShowResult ? 'is-valid' : 'is-provisional'}`} role="status">
+              <span className="material-symbols-outlined" aria-hidden="true">
+                {split.canShowResult ? 'verified' : 'info'}
+              </span>
+              <div>
+                <strong>
+                  {split.canShowResult
+                    ? 'Valid 100% allocation'
+                    : split.hasValidIncome
+                      ? 'Provisional figures — allocation is not 100%'
+                      : 'Enter an income amount greater than 0 to calculate a breakdown'}
+                </strong>
+                <p>
+                  {split.canShowResult
+                    ? `These amounts divide ${currency}${formatAmount(split.income)} into the ${split.totalPct}% allocation shown above.`
+                    : 'These amounts do not describe a valid 50/30/20 plan. Adjust the sliders until the total reaches 100% before relying on any figure below.'}
+                </p>
+              </div>
+            </div>
+
+            <div className="calc-breakdown-card calc-breakdown-needs">
               <div className="breakdown-header">
                 <div>
                   <span className="section-eyebrow">Bucket 01</span>
                   <h3 className="breakdown-cat-title">Essential Needs ({needsPct}%)</h3>
                 </div>
-                <div className="breakdown-allocated-val tabular-nums" style={{ color: 'var(--color-primary)' }}>
-                  {currency}{needsAmount.toLocaleString()} <span style={{ fontSize: '13px', fontWeight: 500, color: 'var(--color-secondary)' }}>/ month</span>
+                <div className="breakdown-allocated-val tabular-nums">
+                  {currency}{formatAmount(split.needsAmount)}{' '}
+                  <span className="breakdown-period">/ month</span>
                 </div>
               </div>
-              <p style={{ fontSize: '13px', color: 'var(--color-secondary)', margin: 0 }}>
-                Covers your shelter, standard groceries, utilities, tuition dues, and healthcare maintenance.
-              </p>
+              <p>Covers your shelter, standard groceries, utilities, tuition dues, and healthcare maintenance.</p>
             </div>
 
-            {/* Wants Card */}
-            <div className="calc-breakdown-card" style={{ borderLeft: '4px solid var(--color-tertiary-container)' }}>
+            <div className="calc-breakdown-card calc-breakdown-wants">
               <div className="breakdown-header">
                 <div>
-                  <span className="section-eyebrow" style={{ color: 'var(--color-tertiary-container)' }}>Bucket 02</span>
+                  <span className="section-eyebrow">Bucket 02</span>
                   <h3 className="breakdown-cat-title">Discretionary Wants ({wantsPct}%)</h3>
                 </div>
-                <div className="breakdown-allocated-val tabular-nums" style={{ color: 'var(--color-tertiary-container)' }}>
-                  {currency}{wantsAmount.toLocaleString()} <span style={{ fontSize: '13px', fontWeight: 500, color: 'var(--color-secondary)' }}>/ month</span>
+                <div className="breakdown-allocated-val tabular-nums">
+                  {currency}{formatAmount(split.wantsAmount)}{' '}
+                  <span className="breakdown-period">/ month</span>
                 </div>
               </div>
-              <p style={{ fontSize: '13px', color: 'var(--color-secondary)', margin: 0 }}>
-                Covers dining out, streaming services, weekend social trips, and lifestyle upgrades without guilt.
-              </p>
+              <p>Covers dining out, streaming services, weekend social trips, and lifestyle upgrades without guilt.</p>
             </div>
 
-            {/* Savings Card */}
-            <div className="calc-breakdown-card" style={{ borderLeft: '4px solid var(--color-secondary)' }}>
+            <div className="calc-breakdown-card calc-breakdown-savings">
               <div className="breakdown-header">
                 <div>
-                  <span className="section-eyebrow" style={{ color: 'var(--color-secondary)' }}>Bucket 03</span>
-                  <h3 className="breakdown-cat-title">Savings & Buffer ({savingsPct}%)</h3>
+                  <span className="section-eyebrow">Bucket 03</span>
+                  <h3 className="breakdown-cat-title">Savings &amp; Buffer ({savingsPct}%)</h3>
                 </div>
-                <div className="breakdown-allocated-val tabular-nums" style={{ color: 'var(--color-secondary)' }}>
-                  {currency}{savingsAmount.toLocaleString()} <span style={{ fontSize: '13px', fontWeight: 500, color: 'var(--color-secondary)' }}>/ month</span>
+                <div className="breakdown-allocated-val tabular-nums">
+                  {currency}{formatAmount(split.savingsAmount)}{' '}
+                  <span className="breakdown-period">/ month</span>
                 </div>
               </div>
-              <p style={{ fontSize: '13px', color: 'var(--color-secondary)', margin: 0 }}>
-                Emergency cushion, high-yield savings deposits, and student debt reduction buffer.
-              </p>
+              <p>Emergency cushion, high-yield savings deposits, and student debt reduction buffer.</p>
             </div>
 
-            {/* Annual Wealth Accrual Projection Banner */}
-            <div style={{ background: 'var(--color-primary)', color: '#ffffff', padding: '20px', borderRadius: '16px', display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '16px' }}>
+            <div className="calc-annual-banner">
               <div>
-                <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.08em', opacity: 0.85 }}>
-                  Educational estimate
-                </span>
-                <div className="tabular-nums" style={{ fontSize: '28px', fontWeight: 700, margin: '4px 0' }}>
-                  +{currency}{annualSavings.toLocaleString()} / year
+                <span className="calc-annual-label">Educational estimate</span>
+                <div className="calc-annual-value tabular-nums">
+                  +{currency}{formatAmount(split.annualSavings)} / year
                 </div>
-                <span style={{ fontSize: '13px', opacity: 0.9 }}>
-                  This is a simple estimate based on the current income and savings percentage.
+                <span className="calc-annual-note">
+                  Twelve times the monthly savings figure above. It is arithmetic, not a prediction.
                 </span>
               </div>
               <Button to="/savings-goals" variant="accent" size="md">

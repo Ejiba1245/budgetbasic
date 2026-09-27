@@ -83,6 +83,7 @@ export function Textarea({
   rows = 4,
   className = '',
   disabled = false,
+  error = false,
   ...props
 }) {
   return (
@@ -93,7 +94,7 @@ export function Textarea({
       placeholder={placeholder}
       rows={rows}
       disabled={disabled}
-      className={`stitch-textarea ${className}`}
+      className={`stitch-textarea ${error ? 'has-error' : ''} ${className}`}
       {...props}
     />
   )

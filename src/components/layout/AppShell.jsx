@@ -1,5 +1,6 @@
 import { Navbar } from './Navbar'
 import { Footer } from './Footer'
+import { GlobalUtilities } from './GlobalUtilities'
 
 export function AppShell({ children }) {
   return (
@@ -9,6 +10,7 @@ export function AppShell({ children }) {
         {children}
       </main>
       <Footer />
+      <GlobalUtilities />
     </div>
   )
 }

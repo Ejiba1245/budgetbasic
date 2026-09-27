@@ -2,7 +2,8 @@ import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Breadcrumbs } from '../components/ui/Breadcrumbs'
 import { PageContainer } from '../components/layout/PageContainer'
-import { filterResources, resourceTypes } from '../data/resources'
+import { filterResources } from '../utils/search'
+import { resourceTypes } from '../data/resources'
 
 export function Search() {
   const [query, setQuery] = useState('')

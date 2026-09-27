@@ -1,0 +1,1 @@
+export function SuggestedQuestions({ questions, onSelect }) { return <div className="chat-suggestions" aria-label="Suggested questions">{questions.map((question) => <button type="button" key={question} onClick={() => onSelect(question)}>{question}</button>)}</div> }

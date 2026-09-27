@@ -1,20 +1,10 @@
 import { useEffect, useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import budgetBasicsLogo from '../../assets/budgetbasics-logo.png'
-import { useStudentProfile } from '../../hooks/useStudentProfile'
+import { navGroups, primaryNav } from '../../data/navigation'
 
-const learnItems = [
-  { to: '/budgeting-basics', label: 'Budgeting Basics' },
-  { to: '/needs-vs-wants', label: 'Needs vs Wants' },
-  { to: '/50-30-20', label: '50/30/20 Rule' },
-  { to: '/money-mistakes', label: 'Money Mistakes' },
-  { to: '/learning-gallery', label: 'Learning Gallery' },
-]
-
-const toolItems = [
-  { to: '/savings-goals', label: 'Savings Goals' },
-  { to: '/expense-planner', label: 'Expense Planner' },
-]
+const homeLink = primaryNav.find((item) => item.to === '/')
+const searchLink = primaryNav.find((item) => item.to === '/search')
 
 function RouteLink({ item, className = 'desktop-nav-link', onClick }) {
   return (
@@ -32,19 +22,19 @@ function RouteLink({ item, className = 'desktop-nav-link', onClick }) {
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [openMenu, setOpenMenu] = useState(null)
-  const { currentStudent } = useStudentProfile()
   const location = useLocation()
-  const learnActive = learnItems.some((item) => item.to === location.pathname)
-  const toolsActive = toolItems.some((item) => item.to === location.pathname)
   const closeMobileMenu = () => setMobileMenuOpen(false)
   const closeMenus = () => setOpenMenu(null)
+  const closeAllMenus = () => {
+    closeMobileMenu()
+    closeMenus()
+  }
 
   useEffect(() => {
     if (!mobileMenuOpen && !openMenu) return undefined
     const handleKeyDown = (event) => {
       if (event.key === 'Escape') {
-        closeMobileMenu()
-        closeMenus()
+        closeAllMenus()
       }
     }
     document.addEventListener('keydown', handleKeyDown)
@@ -52,10 +42,6 @@ export function Navbar() {
   }, [mobileMenuOpen, openMenu])
 
   const toggleMenu = (menu) => setOpenMenu((current) => (current === menu ? null : menu))
-  const closeAllMenus = () => {
-    closeMobileMenu()
-    closeMenus()
-  }
 
   return (
     <header className="stitch-navbar">
@@ -66,26 +52,36 @@ export function Navbar() {
           </Link>
 
           <nav className="desktop-nav" aria-label="Primary navigation">
-            <NavLink to="/" end className="desktop-nav-link">Home</NavLink>
-            <div className="nav-group">
-              <button type="button" className={`nav-group-trigger${learnActive ? ' is-active' : ''}`} aria-haspopup="menu" aria-expanded={openMenu === 'learn'} onClick={() => toggleMenu('learn')}>
-                Learn <span className="material-symbols-outlined" aria-hidden="true">expand_more</span>
-              </button>
-              {openMenu === 'learn' && <div className="nav-group-menu" role="menu">{learnItems.map((item) => <RouteLink key={item.to} item={item} onClick={closeMenus} />)}</div>}
-            </div>
-            <div className="nav-group">
-              <button type="button" className={`nav-group-trigger${toolsActive ? ' is-active' : ''}`} aria-haspopup="menu" aria-expanded={openMenu === 'tools'} onClick={() => toggleMenu('tools')}>
-                Tools <span className="material-symbols-outlined" aria-hidden="true">expand_more</span>
-              </button>
-              {openMenu === 'tools' && <div className="nav-group-menu" role="menu">{toolItems.map((item) => <RouteLink key={item.to} item={item} onClick={closeMenus} />)}</div>}
-            </div>
-            <NavLink to="/search" end className="desktop-nav-link">Search</NavLink>
+            <RouteLink item={homeLink} onClick={closeMenus} />
+            {navGroups.map((group) => {
+              const isActive = group.items.some((item) => item.to === location.pathname)
+              return (
+                <div className="nav-group" key={group.key}>
+                  <button
+                    type="button"
+                    className={`nav-group-trigger${isActive ? ' is-active' : ''}`}
+                    aria-haspopup="menu"
+                    aria-expanded={openMenu === group.key}
+                    onClick={() => toggleMenu(group.key)}
+                  >
+                    {group.title} <span className="nav-chevron" aria-hidden="true" />
+                  </button>
+                  {openMenu === group.key && (
+                    <div className="nav-group-menu" role="menu">
+                      {group.items.map((item) => (
+                        <RouteLink key={item.to} item={item} onClick={closeMenus} />
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+            <RouteLink item={searchLink} onClick={closeMenus} />
           </nav>
         </div>
 
         <div className="navbar-right">
-          <Link to={currentStudent ? '/student-dashboard' : '/signin'} className="navbar-profile-link" onClick={closeAllMenus}>{currentStudent ? currentStudent.name : 'Sign In'}</Link>
-          <Link to={currentStudent ? '/student-dashboard' : '/create-profile'} className="navbar-get-started" onClick={closeAllMenus}>{currentStudent ? 'Dashboard' : 'Get Started'}</Link>
+          <Link to="/budgeting-basics" className="navbar-get-started" onClick={closeAllMenus}>Get Started</Link>
           <button
             type="button"
             className="mobile-menu-btn"
@@ -101,15 +97,16 @@ export function Navbar() {
 
       <div id="mobile-navigation" className={`mobile-nav-drawer${mobileMenuOpen ? ' is-open' : ''}`} aria-hidden={!mobileMenuOpen}>
         <nav className="mobile-nav-links" aria-label="Mobile navigation">
-          <RouteLink item={{ to: '/', label: 'Home' }} className="mobile-nav-link" onClick={closeAllMenus} />
-          <p className="mobile-nav-section-title">Learn</p>
-          {learnItems.map((item) => <RouteLink key={item.to} item={item} className="mobile-nav-link" onClick={closeAllMenus} />)}
-          <p className="mobile-nav-section-title">Tools</p>
-          {toolItems.map((item) => <RouteLink key={item.to} item={item} className="mobile-nav-link" onClick={closeAllMenus} />)}
-          <RouteLink item={{ to: '/search', label: 'Search' }} className="mobile-nav-link" onClick={closeAllMenus} />
-          <p className="mobile-nav-section-title">Profile</p>
-          <RouteLink item={{ to: currentStudent ? '/student-dashboard' : '/signin', label: currentStudent ? 'Dashboard' : 'Sign In' }} className="mobile-nav-link" onClick={closeAllMenus} />
-          {!currentStudent && <RouteLink item={{ to: '/create-profile', label: 'Create Profile' }} className="mobile-nav-link" onClick={closeAllMenus} />}
+          <RouteLink item={homeLink} className="mobile-nav-link" onClick={closeAllMenus} />
+          {navGroups.map((group) => (
+            <div key={group.key}>
+              <p className="mobile-nav-section-title">{group.title}</p>
+              {group.items.map((item) => (
+                <RouteLink key={item.to} item={item} className="mobile-nav-link" onClick={closeAllMenus} />
+              ))}
+            </div>
+          ))}
+          <RouteLink item={searchLink} className="mobile-nav-link" onClick={closeAllMenus} />
         </nav>
       </div>
     </header>

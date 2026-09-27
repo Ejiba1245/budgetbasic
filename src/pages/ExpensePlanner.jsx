@@ -4,6 +4,7 @@ import { Card } from '../components/ui/Card'
 import { FormField, Input, Select } from '../components/ui/FormControls'
 import { PageContainer } from '../components/layout/PageContainer'
 import { Button } from '../components/ui/Button'
+import { EducationalImage } from '../components/ui/EducationalImage'
 import { calculateExpenseSummary, expenseCategories, formatExpenseCurrency, sampleBalance, validateExpense } from '../utils/expensePlanner'
 
 const blankExpense = { date: '', category: '', description: '', amount: '' }
@@ -26,7 +27,7 @@ export function ExpensePlanner() {
 
   const errors = useMemo(() => validateExpense(form), [form])
   const summary = useMemo(() => calculateExpenseSummary(expenses), [expenses])
-  const isOverBudget = summary.remaining < 0
+  const isOverBudget = summary.isOverBudget
 
   const updateField = (field) => (event) => {
     setForm((current) => ({ ...current, [field]: event.target.value }))
@@ -83,19 +84,24 @@ export function ExpensePlanner() {
     <PageContainer className="expense-planner-page">
       <Breadcrumbs items={[{ label: 'Home', to: '/' }, { label: 'Tools', to: '/50-30-20' }, { label: 'Expense Planner' }]} />
 
-      <header className="expense-planner-header">
+      <header className="expense-planner-header expense-planner-header-arranged">
+        <div className="expense-header-copy">
         <span className="section-eyebrow">Practical tool · Planning</span>
-        <h1 className="section-title">Expense Planner</h1>
-        <p className="section-description">Plan a few expenses and see how they affect a sample monthly balance.</p>
+        <h1 className="section-title">Expense Planner</h1>            <p className="section-description">Plan a few expenses and see how they affect a {formatExpenseCurrency(sampleBalance)} sample monthly balance.</p><p className="expense-header-note">Use the planner after reading the short guide. Entries stay on this page and reset when it is refreshed.</p>
+        </div>
+        <EducationalImage asset="student-budget-planning.jpg" alt="Student writing down expenses beside a laptop while planning a budget." className="expense-header-image" loading="eager" />
       </header>
 
       <section className="planner-learning-intro" aria-labelledby="planner-learning-title">
         <span className="section-eyebrow">Read before you plan</span>
         <h2 id="planner-learning-title">What expense tracking can teach you</h2>
         <p>Tracking means recording what you planned to spend and what you actually spent. Over time, the record can help you notice categories, timing and patterns that are easy to miss when purchases happen one at a time.</p>
+        <EducationalImage asset="budgeting-basics.png" alt="Illustration representing a student organising spending into a clear plan." className="planner-learning-image" />
         <div className="planner-learning-grid"><div><strong>Categories</strong><span>Group expenses such as food, transport, school and entertainment.</span></div><div><strong>Planned vs actual</strong><span>Compare your intention with what happened, without treating the difference as a failure.</span></div><div><strong>Patterns</strong><span>Look for repeated small costs or periods when spending rises.</span></div></div>
         <p>Use the planner below as a session-only educational example. It does not save a financial record.</p>
       </section>
+
+      <section className="expense-visual-guide" aria-labelledby="expense-guide-title"><div><span className="section-eyebrow">A simple review path</span><h2 id="expense-guide-title">Record · Group · Compare · Adjust</h2><p>Start with a clear description, place the expense in a category, compare the total with the sample balance and decide what should change in the next plan.</p></div><div className="expense-flow" aria-label="Record, group, compare and adjust expenses"><span>Record</span><i>→</i><span>Group</span><i>→</i><span>Compare</span><i>→</i><span>Adjust</span></div></section>
 
       <Card elevation={1} className="expense-entry-surface">
         <div className="expense-entry-heading">
@@ -119,8 +125,7 @@ export function ExpensePlanner() {
             </FormField>
             <FormField id="expense-amount" label="Amount" hint="Use the project currency format." error={submitted ? errors.amount : undefined}>
               <Input id="expense-amount" type="text" inputMode="decimal" value={form.amount} onChange={updateField('amount')} placeholder="0.00" prefix="$" error={submitted && Boolean(errors.amount)} aria-invalid={submitted && Boolean(errors.amount)} />
-            </FormField>
-          </div>
+            </FormField>          </div>
           <div className="expense-form-footer">
             {confirmation && <span className="expense-confirmation" role="status">{confirmation}</span>}
             <Button type="submit" variant="primary">{editingId ? 'Save changes' : 'Add expense'}</Button>

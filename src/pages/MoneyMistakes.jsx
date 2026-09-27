@@ -1,54 +1,10 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import moneyMistakesImage from '../assets/images/lessons/budgetbee-student-budgeting.png'
+import moneyMistakesImage from '../assets/images/illustrations/common-money-mistakes.png'
 import { Breadcrumbs } from '../components/ui/Breadcrumbs'
 import { PageContainer } from '../components/layout/PageContainer'
-
-const mistakes = [
-  {
-    title: 'Spending Without a Budget',
-    explanation: 'Without a spending plan, it becomes difficult to know where money is going or whether enough remains for important priorities.',
-    habit: 'Create a simple budget before spending.',
-  },
-  {
-    title: 'Impulse Buying',
-    explanation: 'Buying something immediately because it looks attractive or feels necessary can lead to spending that was never part of your plan.',
-    habit: 'Pause before purchasing and ask whether the item is actually needed.',
-  },
-  {
-    title: 'Confusing Needs With Wants',
-    explanation: 'Essential expenses support health, housing, safety, or responsibilities. Wants can be enjoyable, but they usually offer more flexibility.',
-    habit: 'Prioritize needs before wants.',
-    link: { to: '/needs-vs-wants', label: 'Practise with Needs vs Wants' },
-  },
-  {
-    title: 'Not Tracking Expenses',
-    explanation: 'Small purchases can accumulate and become a significant portion of spending before you notice the pattern.',
-    habit: 'Record expenses regularly and review spending patterns.',
-    link: { to: '/expense-planner', label: 'Try the Expense Planner' },
-  },
-  {
-    title: 'Ignoring Savings',
-    explanation: 'Spending all available money leaves little room for future goals or unexpected situations.',
-    habit: 'Set aside part of available income consistently.',
-    link: { to: '/savings-goals', label: 'Set a Savings Goal' },
-  },
-  {
-    title: 'Spending More Than You Earn',
-    explanation: 'When regular spending exceeds available income, the gap can make future budgets harder to manage.',
-    habit: 'Adjust spending so essential expenses and financial goals remain within available income.',
-  },
-  {
-    title: 'Taking Unnecessary Debt',
-    explanation: 'Borrowing creates future obligations and can make later budgets harder to manage.',
-    habit: 'Understand the total cost and repayment obligation before borrowing.',
-  },
-  {
-    title: 'Having No Emergency Plan',
-    explanation: 'Unexpected expenses can disrupt a budget when there is no money set aside to help absorb them.',
-    habit: 'Build an emergency reserve gradually when possible.',
-  },
-]
+import { EducationalImage } from '../components/ui/EducationalImage'
+import { moneyMistakes } from '../data/mistakes'
 
 export function MoneyMistakes() {
   const [openMistake, setOpenMistake] = useState(1)
@@ -67,15 +23,17 @@ export function MoneyMistakes() {
       </header>
 
       <figure className="money-mistakes-image">
-        <img src={moneyMistakesImage} alt="Laptop and notebook used for reviewing financial plans and spending choices." />
+        <img src={moneyMistakesImage} alt="Illustration of a wallet, falling coins and a warning sign representing common money mistakes." />
       </figure>
 
       <section className="mistakes-learning-intro" aria-labelledby="mistakes-start-title">
         <span className="section-eyebrow">How to use this lesson</span>
         <h2 id="mistakes-start-title">Notice the pattern, then choose the next action.</h2>
         <p>Money mistakes are common learning moments. The useful question is not “what is wrong with me?” but “what happened, and what small change would make the next decision easier?”</p>
-        <p>Work through the examples below in order: impulse buying, small expenses, late payments, unused subscriptions, spending without a plan, emotional spending and social pressure.</p>
+        <p>Work through the eight patterns below in order. Each one pairs an explanation with a small habit you could actually practise, so the lesson ends with an action rather than a warning.</p>
       </section>
+
+      <section className="mistakes-review-guide" aria-labelledby="mistakes-review-title"><EducationalImage asset="budgeting-basics.png" alt="Illustration representing a student reviewing a personal budget and making a new plan." className="mistakes-review-image" /><div><span className="section-eyebrow">A better response</span><h2 id="mistakes-review-title">Pause · Understand · Adjust</h2><p>A mistake is useful when it helps you see what happened. Review the choice without judgement, identify the pattern and make one practical change for next time.</p><div className="mistakes-review-steps"><span><b>01</b> Pause before reacting</span><span><b>02</b> Understand the cause</span><span><b>03</b> Adjust the next plan</span></div></div></section>
 
       <section className="mistakes-content" aria-labelledby="mistakes-list-title">
         <div className="mistakes-section-heading">
@@ -87,7 +45,7 @@ export function MoneyMistakes() {
         </div>
 
         <div className="mistakes-list">
-          {mistakes.map((mistake, index) => {
+          {moneyMistakes.map((mistake, index) => {
             const number = index + 1
             const isOpen = openMistake === number
             const panelId = `mistake-panel-${number}`
@@ -111,6 +69,8 @@ export function MoneyMistakes() {
           })}
         </div>
       </section>
+
+      <section className="mistakes-scenario-section" aria-labelledby="mistakes-scenario-title"><div><span className="section-eyebrow">Student scenario</span><h2 id="mistakes-scenario-title">A small purchase becomes a pattern.</h2><p>After several busy days, a student buys food and drinks on the way home instead of checking the weekly plan. The individual purchases feel manageable, but the repeated pattern leaves less money for transport and a savings goal.</p></div><div className="mistakes-corrective-list"><strong>What could help next?</strong><span>Record the purchases for one week.</span><span>Plan an easier lower-cost option.</span><span>Review the category before the next week begins.</span></div></section>
 
       <section className="mistakes-reflection" aria-labelledby="reflection-title">
         <div>

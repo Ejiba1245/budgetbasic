@@ -89,19 +89,29 @@
   --line-height-label-sm: 16px;
 
   /* Radii */
-  --radius-sm: 0.25rem;    /* 4px */
-  --radius-default: 0.5rem; /* 8px */
-  --radius-md: 0.75rem;    /* 12px */
-  --radius-lg: 1rem;       /* 16px */
-  --radius-xl: 1.5rem;     /* 24px */
+  --radius-sm: 0.25rem;
+  /* 4px */
+  --radius-default: 0.5rem;
+  /* 8px */
+  --radius-md: 0.75rem;
+  /* 12px */
+  --radius-lg: 1rem;
+  /* 16px */
+  --radius-xl: 1.5rem;
+  /* 24px */
   --radius-full: 9999px;
 
   /* Spacing Scale */
-  --space-xs: 0.25rem; /* 4px */
-  --space-sm: 0.5rem;  /* 8px */
-  --space-md: 1rem;    /* 16px */
-  --space-lg: 1.5rem;  /* 24px */
-  --space-xl: 2.5rem;  /* 40px */
+  --space-xs: 0.25rem;
+  /* 4px */
+  --space-sm: 0.5rem;
+  /* 8px */
+  --space-md: 1rem;
+  /* 16px */
+  --space-lg: 1.5rem;
+  /* 24px */
+  --space-xl: 2.5rem;
+  /* 40px */
 
   --gutter: 1.5rem;
   --gutter-mobile: 1rem;
@@ -117,7 +127,9 @@
   --max-content-width: 1200px;
 }
 
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
@@ -137,12 +149,18 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-button, input, select, textarea {
+button,
+input,
+select,
+textarea {
   font-family: inherit;
   font-size: inherit;
 }
 
-img, svg { max-width: 100%; }
+img,
+svg {
+  max-width: 100%;
+}
 
 a {
   color: inherit;

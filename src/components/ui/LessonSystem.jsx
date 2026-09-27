@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { Breadcrumbs } from './Breadcrumbs'
-import { resolveAsset } from '../../data/assets'
+import { EducationalImage } from './EducationalImage'
 
 export function LessonHeader({ eyebrow, title, intro, asset, alt, breadcrumbs = [] }) {
   return (
@@ -12,7 +12,7 @@ export function LessonHeader({ eyebrow, title, intro, asset, alt, breadcrumbs = 
           <h1>{title}</h1>
           <p>{intro}</p>
         </div>
-        {asset && <img className="lesson-header-image" src={resolveAsset(asset) || asset} alt={alt} />}
+        {asset && <EducationalImage asset={asset} alt={alt} className="lesson-header-image" loading="eager" />}
       </div>
     </header>
   )

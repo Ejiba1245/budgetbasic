@@ -58,24 +58,3 @@ export const resources = [
     type: 'Resource gallery',
   },
 ]
-
-export function normalizeSearchText(value) {
-  return value
-    .toLowerCase()
-    .replace(/[-_/]+/g, ' ')
-    .replace(/[^a-z0-9\s]/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim()
-}
-
-export function filterResources(query, category = 'All') {
-  const normalizedQuery = normalizeSearchText(query)
-  const queryTokens = normalizedQuery ? normalizedQuery.split(' ') : []
-
-  return resources.filter((resource) => {
-    const matchesCategory = category === 'All' || resource.category === category
-    const searchableText = normalizeSearchText([resource.title, resource.description, resource.category, resource.type, ...resource.keywords].join(' '))
-    const matchesSearch = queryTokens.length === 0 || queryTokens.every((token) => searchableText.includes(token))
-    return matchesCategory && matchesSearch
-  })
-}
